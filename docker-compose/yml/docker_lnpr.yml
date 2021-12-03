@@ -1,0 +1,54 @@
+version: '3'
+services:
+    nginx-php-redis:
+        build: ../../nginx-php-redis
+        image: nginx-php-redis-centos7
+        restart: always
+        container_name: "nginx-php"
+        ports:
+          - "82:80"
+          - "63791:6379"
+        privileged: true
+        volumes:
+          - /nginx-php-redis-mysql/www:/home/wwwroot/
+          - /nginx-php-redis-mysql/docker-compose/log/nginx/access.log:/usr/local/nginx/logs/access.log
+          - /nginx-php-redis-mysql/docker-compose/log/nginx/error.log:/usr/local/nginx/logs/error.log
+          - /nginx-php-redis-mysql/docker-compose/etc/nginx/nginx.conf:/usr/local/nginx/conf/nginx.conf:ro
+          - /nginx-php-redis-mysql/docker-compose/etc/nginx/conf.d/:/usr/local/nginx/conf/conf.d/:ro
+          - /nginx-php-redis-mysql/docker-compose/etc/php/php.ini:/usr/local/php/lib/php.ini:ro
+          - /nginx-php-redis-mysql/docker-compose/etc/php/php-fpm.conf:/usr/local/php/etc/php-fpm.conf:ro
+          - /nginx-php-redis-mysql/docker-compose/etc/php/php-fpm.d/www.conf:/usr/local/php/etc/php-fpm.d/www.conf:ro
+          - /nginx-php-redis-mysql/docker-compose/log/php/php-fpm.log:/usr/local/php/var/log/php-fpm.log
+          - /nginx-php-redis-mysql/docker-compose/log/php/php_errors.log:/usr/local/php/var/log/php_errors.log
+          - /nginx-php-redis-mysql/docker-compose/redis/data:/usr/local/redis/data
+          - /nginx-php-redis-mysql/docker-compose/etc/redis/redis.conf:/usr/local/redis/etc/redis.conf:ro
+          - /nginx-php-redis-mysql/docker-compose/log/redis/redis.log:/var/log/redis/redis.log
+          - /etc/localtime:/etc/localtime:ro
+        # command: /usr/sbin/init
+        # command: 
+        #   - /bin/bash
+        #   - -c
+        #   - |
+        #     ./entrypoint.sh
+        stdin_open: true
+        tty: true
+    mysql56:
+          build: ../../mysql
+          image: mysql56-centos7
+          restart: always
+          container_name: "mysql56"
+          ports:
+            - "3307:3306"
+          privileged: true
+          volumes:
+            - /nginx-php-redis-mysql/mysql/data:/data/mysql/data
+            - /nginx-php-redis-mysql/docker-compose/etc/mysql/my.cnf:/etc/my.cnf:ro
+            - /nginx-php-redis-mysql/docker-compose/log/mysql/error.log:/usr/local/mysql/error.log
+            - /etc/localtime:/etc/localtime:ro
+          # command: 
+          #   - /bin/bash
+          #   - -c
+          #   - |
+          #     ./entrypoint.sh
+          stdin_open: true
+          tty: true
